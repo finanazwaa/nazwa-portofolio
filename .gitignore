@@ -37,3 +37,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# notes for AI coding tools (AGENTS.md is re-created by `next dev`)
+AGENTS.md
+CLAUDE.md
