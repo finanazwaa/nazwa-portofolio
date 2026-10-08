@@ -1,26 +1,629 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* paper & ink */
+  --paper: #FFFFFF;          /* clean white page */
+  --paper-deep: #F7F6D7;    /* ivory for layered blocks */
+  --ceramic: #F7F6D7;       /* ivory card stock */
+  --ink: #232019;
+  --muted: #6B6458;          /* ≥ 4.5:1 on paper and card stock */
+  --line: #D8CCB4;
+  /* earlier liked accent set */
+  --powder: #F7F6D7;
+  --blush: #EAB0C8;
+  --butter: #E7D8A4;
+  --sage: #B9CC7A;
+  --coral: #EAB0C8;
+  --accent: #6E1E3B;
+  --cobalt: #6E1E3B;
+  /* legacy scene tokens (3D desk) */
+  --oak: #D9C7A7;
+  --aluminum: #C7C9CC;
+  --notebook: #232323;
+  --kraft: #C8A97E;
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fade: 500ms;
+  --duration-preview: 300ms;
+  --duration-hover: 180ms;
+  --duration-nav: 600ms;
+  --duration-nav-in: 300ms;
+  --duration-scene-crossfade: 500ms;
+  /* layout */
+  --section-space: clamp(120px, 14vw, 160px);
+  --content-max: 1200px;
+  --page-gutter: clamp(24px, 5vw, 72px);
+  --header-height: 88px; /* updated at runtime from the sticky header */
+  /* hand-cut shapes & textures */
+  --radius-hand: 18px 26px 20px 30px / 26px 18px 30px 20px;
+  --radius-hand-sm: 10px 14px 9px 16px / 14px 9px 16px 10px;
+  --grain: url("/textures/grain.png"); /* pre-rendered noise tile — far cheaper to paint than an SVG turbulence filter */
+  --squiggle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='6' viewBox='0 0 24 6'%3E%3Cpath d='M0 3 Q 6 0 12 3 T 24 3' fill='none' stroke='%23EE7A63' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  --squiggle-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='6' viewBox='0 0 24 6'%3E%3Cpath d='M0 3 Q 6 0 12 3 T 24 3' fill='none' stroke='%23232019' stroke-opacity='0.35' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-cobalt: var(--cobalt);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+  --font-hand: var(--font-caveat);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Resets live in the base layer so component colours (e.g. cream text on the red card) win. */
+@layer base {
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  button, input, textarea { font: inherit; }
 }
-
+html { background: #FFFFFF; scroll-behavior: smooth; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: clip; /* decorative layers may poke past the gutter; never scroll sideways */
+  background: #FFFFFF;
+  color: var(--ink);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+/* Scanned-paper backdrop: soft colour washes at the edges plus grain, fixed behind everything. */
+body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    var(--grain),
+    radial-gradient(42% 34% at 0% 0%, color-mix(in srgb, var(--blush) 55%, transparent), transparent 72%),
+    radial-gradient(38% 30% at 100% 6%, color-mix(in srgb, var(--powder) 60%, transparent), transparent 72%),
+    radial-gradient(36% 30% at 96% 100%, color-mix(in srgb, var(--butter) 45%, transparent), transparent 72%),
+    radial-gradient(34% 28% at 2% 96%, color-mix(in srgb, var(--powder) 40%, transparent), transparent 72%),
+    var(--paper);
+}
+::selection { background: var(--butter); color: var(--ink); }
+
+/* Component classes live in a layer so Tailwind utilities in markup can still override them. */
+@layer components {
+  /* ---------- type ---------- */
+  .display-title {
+    font-family: var(--font-fraunces), serif;
+    font-size: clamp(56px, 9vw, 104px);
+    font-weight: 420;
+    font-variation-settings: "SOFT" 60, "opsz" 144;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+  .display-title em, .editorial-em {
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+    color: var(--cobalt);
+  }
+  .meta-label { font-size: 12px; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; }
+  .content-copy { max-width: 65ch; font-size: 16px; line-height: 1.65; }
+  .font-hand { font-family: var(--font-caveat), cursive; }
+
+  /* Handwritten section marker, e.g. "no. 01 — about". */
+  .kicker {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-family: var(--font-caveat), cursive;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+    transform: rotate(-3deg);
+    transform-origin: left center;
+  }
+  /* Highlighter swipe behind a word. */
+  .marker {
+    padding: 0 0.12em;
+    background: linear-gradient(176deg, transparent 52%, var(--marker, var(--butter)) 52% 86%, transparent 86%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .marker-blush { --marker: var(--blush); }
+  .marker-powder { --marker: var(--powder); }
+  .marker-sage { --marker: var(--sage); }
+  /* Short handwritten aside. */
+  .hand-note {
+    color: var(--ink);
+    font-family: var(--font-caveat), cursive;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+  .pull-quote {
+    position: relative;
+    max-width: 16ch;
+    color: var(--accent);
+    font-family: var(--font-caveat), cursive;
+    font-size: clamp(36px, 4.4vw, 52px);
+    font-weight: 700;
+    line-height: 1.02;
+    transform: rotate(-4deg);
+  }
+  .pull-quote::before {
+    content: "“";
+    position: absolute;
+    top: -0.35em;
+    left: -0.45em;
+    color: var(--coral);
+    font-family: var(--font-fraunces), serif;
+    font-size: 1.6em;
+    opacity: 0.55;
+  }
+
+  .pull-quote::after {
+    content: "”";
+    position: absolute;
+    right: -0.18em;
+    bottom: -0.18em;
+    color: var(--coral);
+    font-family: var(--font-fraunces), serif;
+    font-size: 1.5em;
+    opacity: 0.6;
+  }
+
+  /* ---------- collage pieces ---------- */
+  /* Washi tape: add .tape to a positioned element; tweak with --tape-color / --tape-x / --tape-rot. */
+  .tape::before {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: -12px;
+    left: var(--tape-x, 28px);
+    width: 86px;
+    height: 24px;
+    background: var(--grain), color-mix(in srgb, var(--tape-color, var(--butter)) 82%, transparent);
+    clip-path: polygon(0 8%, 5% 0, 10% 9%, 15% 0, 20% 8%, 80% 4%, 85% 0, 90% 9%, 95% 1%, 100% 8%, 100% 92%, 95% 100%, 90% 91%, 85% 100%, 80% 93%, 20% 96%, 15% 100%, 10% 91%, 5% 100%, 0 92%);
+    transform: rotate(var(--tape-rot, -5deg));
+    pointer-events: none;
+  }
+  .tape-blush { --tape-color: var(--blush); }
+  .tape-powder { --tape-color: var(--powder); }
+  .tape-sage { --tape-color: var(--sage); }
+  /* Label strip, like a typed label stuck onto the page. */
+  .label-tape {
+    display: inline-block;
+    padding: 5px 12px 4px;
+    background: var(--grain), color-mix(in srgb, var(--label-color, var(--powder)) 88%, transparent);
+    color: var(--ink);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    transform: rotate(var(--label-rot, -1.5deg));
+  }
+  /* Translucent cut-paper circles, multiplied over whatever sits beneath. */
+  .blob {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    background: var(--blob-color, var(--blush));
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  /* Card stock with a hand-cut edge. */
+  .paper-card {
+    position: relative;
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: var(--radius-hand);
+    background: var(--grain), var(--ceramic);
+    box-shadow: 3px 4px 0 color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+  .squiggle-rule {
+    height: 6px;
+    background: var(--squiggle-ink) repeat-x left center / 24px 6px;
+  }
+
+  /* ---------- chrome ---------- */
+  .site-header {
+    background: var(--grain), color-mix(in srgb, var(--paper) 94%, var(--blush));
+  }
+  .site-header::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
+    height: 6px;
+    background: var(--squiggle-ink) repeat-x left center / 24px 6px;
+  }
+  .monogram {
+    display: inline-grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+    border-radius: 48% 52% 46% 54% / 54% 46% 52% 48%;
+    background: var(--grain), var(--blush);
+    font-family: var(--font-fraunces), serif;
+    font-size: 17px;
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
+    letter-spacing: 0.02em;
+    transform: rotate(-8deg);
+    transition: transform var(--duration-hover) var(--ease-out);
+  }
+  .monogram:hover { transform: rotate(4deg) scale(1.04); }
+  .nav-link {
+    padding-bottom: 6px;
+    background: var(--squiggle) repeat-x left bottom / 24px 6px;
+    background-size: 0 6px;
+    transition: background-size var(--duration-preview) var(--ease-out);
+  }
+  .nav-link:hover { background-size: 100% 6px; }
+  .nav-link[aria-current] { background-size: 100% 6px; }
+
+  .transition-wash {
+    position: fixed;
+    z-index: 50;
+    inset: 0;
+    pointer-events: none;
+    background: var(--grain), var(--paper);
+    opacity: 0;
+    transition: opacity var(--duration-nav-in) var(--ease-io);
+  }
+  .transition-wash-scene { transition-duration: var(--duration-scene-crossfade); }
+  .transition-wash.is-active { opacity: 1; }
+  .preloader {
+    position: fixed;
+    z-index: 60;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--grain), var(--paper);
+    animation: preloader-out 760ms var(--ease-out) forwards;
+  }
+  @keyframes preloader-out {
+    0%, 68% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  .page-section { scroll-margin-top: var(--header-height); }
+  .page-section:focus { outline: none; }
+  .page-shell { width: min(100% - 2 * var(--page-gutter), var(--content-max)); margin-inline: auto; }
+  .studio-link { transition: color 180ms var(--ease-out); }
+  .studio-link:hover { color: var(--accent); }
+  .text-link {
+    padding-bottom: 4px;
+    background: var(--squiggle) repeat-x left bottom / 0 6px;
+    transition: background-size var(--duration-preview) var(--ease-out), color var(--duration-hover) var(--ease-out);
+  }
+  .text-link:hover, .text-link:focus-visible { color: var(--ink); background-size: 24px 6px; }
+
+  /* ---------- hero ---------- */
+  .hero-blob-1 { top: 8%; left: -6%; width: clamp(220px, 30vw, 380px); aspect-ratio: 1; --blob-color: var(--blush); }
+  .hero-blob-2 { bottom: 10%; left: 22%; width: clamp(120px, 14vw, 180px); aspect-ratio: 1; --blob-color: var(--butter); }
+  .hero-blob-3 { top: 4%; right: 2%; width: clamp(140px, 16vw, 220px); aspect-ratio: 1; --blob-color: var(--powder); }
+  .scene-collage { position: relative; isolation: isolate; }
+  .scene-collage::before { /* offset colour block behind the print */
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 6% -3% -5% 7%;
+    border-radius: var(--radius-hand);
+    background: var(--grain), var(--powder);
+    transform: rotate(2.4deg);
+  }
+  .photo-print {
+    position: relative;
+    padding: 10px 10px 12px;
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    background: var(--grain), var(--ceramic);
+    box-shadow: 4px 6px 0 color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .scene-collage .tape-a { position: absolute; top: 0; left: 6%; }
+  /* anchored so the 86px strip ends inside the print, even on narrow phones */
+  .scene-collage .tape-b { position: absolute; top: 0; right: 16%; --tape-x: -44px; --tape-rot: 6deg; --tape-color: var(--blush); }
+
+  /* ---------- scene chips (3D fallback & hover labels) ---------- */
+  .still-life-image { transition: opacity var(--duration-fade) var(--ease-out); }
+  .scene-frame.is-enhanced .still-life-image { opacity: 0; }
+  .scene-chip {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
+    border-radius: var(--radius-hand-sm);
+    background: var(--grain), var(--butter);
+    padding: 6px 11px 5px;
+    color: var(--ink);
+    font-family: var(--font-inter), sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    transition: transform var(--duration-hover) var(--ease-out), background-color var(--duration-hover) var(--ease-out);
+  }
+  /* Only the static fallback chips tilt. The 3D hover chip must stay square: drei wraps it in a
+     div that would otherwise catch clicks in the uncovered corners and swallow them. */
+  .scene-fallback-links .scene-chip { transform: rotate(-2deg); white-space: nowrap; }
+  .scene-fallback-links .scene-chip:hover, .scene-fallback-links .scene-chip:focus-visible { transform: rotate(0deg) translateY(-1px); }
+  .scene-fallback-links { z-index: 2; }
+  .scene-chip-1, .scene-chip-2, .scene-chip-3, .scene-chip-4 { position: absolute; }
+  /* Centred just above each drawing, where the 3D hover chip appears; the vase's sits below it
+     so it doesn't collide with the laptop's when all four show at once. */
+  .scene-chip-1, .scene-chip-2, .scene-chip-3, .scene-chip-4 { translate: -50% -50%; }
+  .scene-chip-1 { left: 51.8%; top: 24.5%; }
+  .scene-chip-2 { left: 23.9%; top: 29.1%; }
+  .scene-chip-3 { left: 82%; top: 75.5%; }
+  .scene-chip-4 { left: 52.3%; top: 61.1%; }
+  /* Flat copies of the desk drawings, placed where the fixed 3D camera shows them (bottom edge on
+     the desk). Recompute these if an object's position or width changes in lib/content.ts. */
+  .desk-still { position: absolute; height: auto; }
+  .desk-still-1 { left: 37.6%; bottom: 35%; width: 28.4%; }
+  .desk-still-2 { left: 11.3%; bottom: 27.6%; width: 25.2%; }
+  .desk-still-3 { left: 68.1%; bottom: 29.7%; width: 16.2%; }
+  .desk-still-4 { left: 41.3%; bottom: 1.1%; width: 22%; }
+  .scene-frame > div:last-child { z-index: 1; }
+  .scene-frame canvas { display: block; width: 100%; height: 100%; }
+
+  /* ---------- about ---------- */
+  .index-card { padding: 28px 24px 26px; transform: rotate(var(--card-tilt, 0deg)); }
+  .index-card dt { margin-bottom: 0.25rem; }
+
+  .tool-tile {
+    position: relative;
+    display: grid;
+    width: 56px;
+    height: 56px;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    border-radius: 12px;
+    background: #FFFDF8;
+    transition: transform var(--duration-hover) var(--ease-out), border-color var(--duration-hover) var(--ease-out);
+  }
+  /* Monochrome at rest; the full-colour logo crossfades in on hover. */
+  .tool-tile > img { grid-area: 1 / 1; transition: opacity var(--duration-hover) var(--ease-out); }
+  .tool-logo-color { opacity: 0; }
+  .tool-label {
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + 6px);
+    left: 50%;
+    padding: 2px 9px 1px;
+    border-radius: var(--radius-hand-sm);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-caveat), cursive;
+    font-size: 17px;
+    line-height: 1.3;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -4px) rotate(-2deg);
+    transition: opacity var(--duration-hover) var(--ease-out), transform var(--duration-hover) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .tool-tile:hover { z-index: 1; transform: translateY(-2px) rotate(-3deg); border-color: color-mix(in srgb, var(--ink) 45%, transparent); }
+    .tool-tile:hover .tool-logo-mono { opacity: 0; }
+    .tool-tile:hover .tool-logo-color { opacity: 1; }
+    .tool-tile:hover .tool-label { opacity: 1; transform: translate(-50%, 0) rotate(-2deg); }
+  }
+  /* Experience: a plain list by default; components/experience-list.tsx rotates one entry at a
+     time when JS runs and motion is allowed. Outgoing entries rise out, the next rises in. */
+  .experience-list { display: grid; gap: 1.25rem; }
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .experience-list { gap: 0; }
+    .experience-item {
+      grid-area: 1 / 1;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity var(--duration-preview) var(--ease-out), transform var(--duration-preview) var(--ease-out);
+    }
+    .experience-item[data-leaving] { transform: translateY(-8px); }
+    .experience-item[data-active] {
+      opacity: 1;
+      transform: none;
+      transition-duration: var(--duration-fade);
+      transition-delay: 200ms;
+    }
+  }
+
+  /* ---------- areas: coloured notes ---------- */
+  .areas-card { --tilt: 0deg; position: relative; perspective: 1200px; opacity: 0.8; transform: translateY(8px) rotate(var(--tilt)); transition: opacity 700ms var(--ease-io), transform 700ms var(--ease-io); }
+  .areas-card.is-revealed { opacity: 1; transform: rotate(var(--tilt)); }
+  .areas-card:nth-child(4n + 1) { --tilt: -1.4deg; --note: var(--powder); --tape-color: var(--blush); }
+  .areas-card:nth-child(4n + 2) { --tilt: 1.1deg; --note: var(--blush); --tape-color: var(--butter); --tape-x: 62%; }
+  .areas-card:nth-child(4n + 3) { --tilt: 0.8deg; --note: var(--sage); --tape-color: var(--powder); --tape-x: 40%; }
+  .areas-card:nth-child(4n + 4) { --tilt: -0.9deg; --note: var(--butter); --tape-color: var(--blush); --tape-x: 18%; }
+  .areas-card-inner { position: relative; display: grid; transform-style: preserve-3d; transition: transform 700ms var(--ease-io); }
+  .areas-card.is-revealed .areas-card-inner { transform: rotateY(180deg); }
+  .areas-card-face {
+    grid-area: 1 / 1;
+    padding: 28px 26px 26px;
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    border-radius: var(--radius-hand);
+    background: var(--grain), var(--note, var(--powder));
+    backface-visibility: hidden;
+  }
+  .areas-card-back { transform: rotateY(180deg); }
+  .areas-card .note-muted { color: color-mix(in srgb, var(--ink) 80%, transparent); }
+  .areas-card-number { color: var(--accent); font-family: var(--font-caveat), cursive; font-size: 24px; font-weight: 700; line-height: 1; }
+  .areas-keywords li + li::before { content: "✶"; margin-right: 0.6rem; color: var(--accent); font-size: 9px; vertical-align: 2px; }
+
+  /* ---------- work deck ---------- */
+  .work-stack { display: grid; gap: var(--section-space); }
+  .work-card {
+    display: block;
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+    border-radius: var(--radius-hand);
+    background: var(--grain), var(--ceramic);
+    color: var(--ink);
+    box-shadow: 4px 5px 0 color-mix(in srgb, var(--ink) 8%, transparent);
+    transition: transform var(--duration-preview) var(--ease-out), border-color var(--duration-preview) var(--ease-out);
+  }
+  .work-card:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; }
+  .work-card-no { color: var(--accent); font-family: var(--font-caveat), cursive; font-size: 24px; font-weight: 700; line-height: 1; }
+  .work-card-title {
+    font-family: var(--font-fraunces), serif;
+    font-size: clamp(26px, 3.2vw, 38px);
+    font-weight: 450;
+    font-variation-settings: "SOFT" 50, "opsz" 72;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .work-card-muted { color: var(--muted); }
+  .work-card .label-tape { --label-color: var(--swatch); }
+  .work-card-visual {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    border-radius: 14px 20px 16px 22px / 20px 14px 22px 16px;
+    background: var(--grain), var(--swatch, var(--powder));
+  }
+  .work-card-image { transition: transform var(--duration-preview) var(--ease-out); }
+  .visual-dot { position: absolute; border-radius: 50%; mix-blend-mode: multiply; opacity: 0.75; }
+  .visual-strip { position: absolute; background: var(--grain), var(--ceramic); opacity: 0.85; }
+  .work-card-featured { border-color: color-mix(in srgb, var(--accent) 80%, var(--ink)); background: var(--grain), var(--accent); color: #FFF8EC; }
+  /* Softened text drops below 4.5:1 on the red, so secondary text stays full cream here. */
+  .work-card-featured .work-card-muted, .work-card-featured .work-card-no { color: #FFF8EC; }
+  .work-card-featured .label-tape { color: var(--ink); }
+  @media (hover: hover) {
+    .work-card:hover { transform: translateY(-3px) rotate(-0.4deg); border-color: color-mix(in srgb, var(--ink) 50%, transparent); }
+    .work-card:hover .work-card-image { transform: scale(1.02); }
+  }
+
+  /* Scroll-driven deck. Without JS, with reduced motion, or where `scripting` is unsupported the
+     cards stay the plain list above; components/work-deck.tsx drives the per-card transforms. */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .work-deck { height: calc(var(--deck-count) * 100vh); height: calc(var(--deck-count) * 100svh); }
+    .work-deck-stage {
+      position: sticky;
+      top: var(--header-height);
+      display: grid;
+      place-items: center;
+      height: calc(100vh - var(--header-height));
+      height: calc(100svh - var(--header-height));
+    }
+    .work-deck .work-stack { width: 100%; gap: 0; }
+    .work-deck-card {
+      grid-area: 1 / 1;
+      z-index: var(--deck-z);
+      justify-self: center;
+      width: 100%;
+      /* keep the whole card (header, line, 16:9 visual) inside the stage height */
+      max-width: min(100%, calc((100svh - var(--header-height) - 290px) * 16 / 9));
+      transform: rotate(var(--deck-rest)) scale(0.96);
+      transform-origin: 50% 100%;
+      will-change: transform;
+    }
+    .work-deck-card:first-child { transform: none; }
+  }
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) and (max-width: 767px) {
+    .work-deck { height: calc(var(--deck-count) * 70vh); height: calc(var(--deck-count) * 70svh); }
+  }
+
+  /* ---------- contact ---------- */
+  .contact-spread { padding: clamp(32px, 6vw, 72px); }
+  .cta-sticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 14px 26px 13px;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-hand-sm);
+    background: var(--accent);
+    color: #FFF8EC;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-1.5deg);
+    transition: transform var(--duration-hover) var(--ease-out), box-shadow var(--duration-hover) var(--ease-out);
+  }
+  .cta-sticker:hover, .cta-sticker:focus-visible { transform: rotate(0deg) translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink); }
+  .cta-sticker:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .cta-sticker:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; }
+  .link-sticker {
+    display: inline-block;
+    padding: 6px 13px 5px;
+    border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+    border-radius: var(--radius-hand-sm);
+    background: var(--grain), var(--sticker, var(--powder));
+    color: var(--ink);
+    font-size: 13px;
+    transform: rotate(var(--sticker-rot, -1deg));
+    transition: transform var(--duration-hover) var(--ease-out);
+  }
+  .link-sticker:hover, .link-sticker:focus-visible { transform: rotate(0deg) translateY(-2px); }
+
+  /* ---------- project spread ---------- */
+  .spread-hero { position: relative; isolation: isolate; }
+  .spread-hero-visual {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    border-radius: var(--radius-hand);
+    background: var(--grain), var(--swatch, var(--powder));
+  }
+  .hero-gallery-track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hero-gallery-track::-webkit-scrollbar { display: none; }
+  .hero-gallery-track:focus-visible { outline: 2px solid var(--cobalt); outline-offset: -4px; }
+  .hero-gallery-slide { position: relative; flex: 0 0 100%; overflow: hidden; scroll-snap-align: start; }
+  .hero-gallery-dot {
+    width: 9px;
+    height: 9px;
+    border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+    border-radius: 50%;
+    transition: background-color var(--duration-hover) var(--ease-out), transform var(--duration-hover) var(--ease-out);
+  }
+  .hero-gallery-dot.is-active { background: var(--accent); border-color: var(--accent); transform: scale(1.25); }
+  .hero-gallery-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 34px;
+    border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+    border-radius: var(--radius-hand-sm);
+    background: var(--grain), var(--powder);
+    color: var(--ink);
+    font-size: 15px;
+    transform: rotate(var(--sticker-rot, -1deg));
+    transition: transform var(--duration-hover) var(--ease-out);
+  }
+  .hero-gallery-btn:hover, .hero-gallery-btn:focus-visible { transform: rotate(0deg) translateY(-2px); }
+  .hero-gallery-btn:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
+  .chapter-no { color: var(--accent); font-family: var(--font-caveat), cursive; font-size: 30px; font-weight: 700; line-height: 1; }
+  .chapter-title {
+    font-family: var(--font-fraunces), serif;
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+    line-height: 1.05;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .areas-card, .areas-card-inner { transition: none; }
+    .areas-card { opacity: 1; transform: rotate(var(--tilt)); }
+    .areas-card.is-revealed .areas-card-inner { transform: none; }
+    .areas-card.is-revealed .areas-card-front { visibility: hidden; }
+    .areas-card.is-revealed .areas-card-back { transform: none; backface-visibility: visible; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+  }
 }

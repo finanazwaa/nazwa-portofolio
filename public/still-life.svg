@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="title desc">
+  <title id="title">desk still life</title>
+  <desc id="desc">A fixed view of a quiet morning desk with a laptop, notebook and pen, a mug and pencil cup, and a phone on a kraft envelope.</desc>
+  <rect width="900" height="620" fill="#F6F3EE"/>
+  <path d="M24 94H876V596H24Z" fill="#D9C7A7"/>
+  <path d="M24 94H876" stroke="#cbb995" stroke-width="2"/>
+  <g id="laptop" stroke-linejoin="round">
+    <path d="M384 171 650 153 706 323 431 347Z" fill="#B6B8BB" stroke="#9b9da0" stroke-width="3"/>
+    <path d="M399 180 640 164 685 306 444 329Z" fill="#242522" stroke="#77797a" stroke-width="5"/>
+    <path d="M407 187 633 172 675 301 450 321Z" fill="#FAFAF7"/>
+    <path d="M371 341 709 313 752 343 403 378Z" fill="#C7C9CC" stroke="#a7a9ab" stroke-width="3"/>
+    <path d="M449 346 627 332 640 342 461 359Z" fill="#a9abad"/>
+    <path d="M403 365 752 337 741 352 414 386Z" fill="#afb1b4"/>
+  </g>
+  <g id="notebook" stroke-linejoin="round">
+    <path d="m107 258 196-20 49 180-204 22Z" fill="#232323"/>
+    <path d="m119 269 174-18 39 148-178 19Z" fill="#2e2e2c"/>
+    <path d="m144 282 177-17" stroke="#454542" stroke-width="2"/>
+    <g fill="none" stroke="#C7C9CC" stroke-width="4">
+      <path d="M117 257c-7-3-10-9-10-16s3-13 9-16"/><path d="M139 255c-7-3-10-9-10-16s3-13 9-16"/><path d="M161 252c-7-3-10-9-10-16s3-13 9-16"/><path d="M183 250c-7-3-10-9-10-16s3-13 9-16"/><path d="M205 248c-7-3-10-9-10-16s3-13 9-16"/><path d="M227 246c-7-3-10-9-10-16s3-13 9-16"/><path d="M249 244c-7-3-10-9-10-16s3-13 9-16"/><path d="M271 242c-7-3-10-9-10-16s3-13 9-16"/><path d="M293 240c-7-3-10-9-10-16s3-13 9-16"/>
+    </g>
+    <path d="m171 363 89-9" stroke="#C4402F" stroke-width="6" stroke-linecap="round"/>
+    <path d="m171 363 14-8-3 14Z" fill="#8d3027"/>
+  </g>
+  <g id="mug-and-pencil-cup" stroke-linejoin="round">
+    <path d="m688 281 73-6 5 99-74 7Z" fill="#FAFAF7" stroke="#d4d1ca" stroke-width="3"/>
+    <ellipse cx="727" cy="280" rx="37" ry="11" transform="rotate(-5 727 280)" fill="#f4f2ec" stroke="#d4d1ca" stroke-width="3"/>
+    <path d="M763 298c43-12 42 48 4 53" fill="none" stroke="#FAFAF7" stroke-width="13"/>
+    <path d="M763 298c43-12 42 48 4 53" fill="none" stroke="#d4d1ca" stroke-width="3"/>
+    <path d="m782 207 75-7 8 102-76 8Z" fill="#c7b493" stroke="#ad9570" stroke-width="3"/>
+    <ellipse cx="819" cy="204" rx="39" ry="10" transform="rotate(-5 819 204)" fill="#d4c4a8" stroke="#ad9570" stroke-width="3"/>
+    <path d="m798 205 1-77 9-1 11 78M817 203l14-92 9 1-14 91M837 201l25-68 8 4-25 67" fill="none" stroke="#716f66" stroke-width="7" stroke-linecap="round"/>
+    <path d="m798 128 4-14 6 13M833 111l4-14 6 14M861 137l8-13 2 16" fill="#716f66"/>
+  </g>
+  <g id="phone-and-envelope" stroke-linejoin="round">
+    <path d="m330 433 210-20 139 90-215 26Z" fill="#c8a97e" stroke="#b28f64" stroke-width="3"/>
+    <path d="m330 433 134 72 215-2-139-90Z" fill="#d4b88f" stroke="#b28f64" stroke-width="2"/>
+    <path d="m330 433 134 72 139-92" fill="none" stroke="#b28f64" stroke-width="3"/>
+    <path d="m531 389 119-12 17 67-120 13Z" fill="#232323" stroke="#111210" stroke-width="3"/>
+    <path d="m543 398 94-9 12 46-94 10Z" fill="#292a28"/>
+    <circle cx="641" cy="384" r="3" fill="#77756e"/>
+  </g>
+</svg>
