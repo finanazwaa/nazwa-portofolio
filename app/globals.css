@@ -164,14 +164,16 @@ body::before {
     opacity: 0.55;
   }
 
+  /* Inline after the last word so it hugs the text instead of floating at the box edge. */
   .pull-quote::after {
     content: "”";
-    position: absolute;
-    right: -0.18em;
-    bottom: -0.18em;
+    display: inline-block;
+    margin-left: 0.3em;
     color: var(--coral);
     font-family: var(--font-fraunces), serif;
     font-size: 1.5em;
+    line-height: 0;
+    vertical-align: -0.45em;
     opacity: 0.6;
   }
 
