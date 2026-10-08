@@ -258,9 +258,12 @@ export const about = {
   education: "Universitas Gadjah Mada, Bachelor of Computer Science, 2024–present",
   // Newest first. The list is rendered in this order and reveals entry by entry on scroll.
   experience: [
-    { role: "Marketing Analytics & Research", organization: "by.U", period: "2025–present" },
-    { role: "Data Analyst & Research Intern", organization: "E-Nose Research Project", period: "2024–2025" },
-    { role: "Product & Design Collaborator", organization: "Creative Media & Research", period: "2023–2024" },
+    { role: "Team Leader of Global Product Marketing", organization: "AIESEC in UGM", period: "2025–2026" },
+    { role: "Staff of Strategy & Growth", organization: "SHARE Do Well Do Good UGM", period: "2025–2026" },
+    { role: "Designer", organization: "Datacracy", period: "2025–Present" },
+    { role: "Data Analyst & Qt Developer", organization: "E-nose Research Project", period: "2025–2026" },
+    { role: "Content Marketing Intern", organization: "Asymmetric Ventures", period: "2026" },
+    { role: "Creative Content", organization: "AMAN Space", period: "2023" },
   ] satisfies ExperienceEntry[],
   // Logos: public/logos/<slug>.svg (ink-toned, Simple Icons) and public/logos/color/<slug>.svg
   // (full-colour, Devicon; brand-colour Simple Icons where no full-colour version exists). Max 12.
