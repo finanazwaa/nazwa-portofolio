@@ -251,7 +251,7 @@ export const areas = [
 
 export const about = {
   paragraphs: [
-    "interested in Marketing Analytics, consumer insights, and data-driven marketing. Combines analytical thinking with creativity through experience in marketing, product development, design, and creative media.",
+    "Interested in Marketing Analytics, consumer insights, and data-driven marketing. Combines analytical thinking with creativity through experience in marketing, product development, design, and creative media.",
     "I’m interested in understanding people through data and turning insights into better experiences. I bring together technology, consumer insight, and creativity to solve real-world problems.",
   ],
   quote: "Curiosity leads. Everything else follows.",
